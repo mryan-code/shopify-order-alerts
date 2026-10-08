@@ -1,0 +1,16 @@
+api_version = "2026-01"
+
+[[extensions]]
+name = "t:name"
+handle = "order-sms-block"
+type = "ui_extension"
+uid = "8f3c1a2e-6b47-4d1a-9c5e-2a7b0d4e6f18"
+description = "t:description"
+
+  [[extensions.targeting]]
+  module = "./src/Block.tsx"
+  target = "admin.order-details.block.render"
+
+[extensions.capabilities]
+api_access = true
+network_access = true
