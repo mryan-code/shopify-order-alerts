@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Shop {
+  domain        String    @id
+  name          String?
+  timezone      String    @default("America/New_York")
+  installed     Boolean   @default(true)
+  installedAt   DateTime  @default(now())
+  uninstalledAt DateTime?
+  settings      ShopSettings?
+}
+
+model ShopSettings {
+  shop               String  @id
+  smsEvents          String
+  voiceEvents        String
+  templates          String
+  quietHoursEnabled  Boolean @default(true)
+  quietHoursStart    String  @default("21:00")
+  quietHoursEnd      String  @default("08:00")
+  quietHoursTimezone String  @default("America/New_York")
+  stalledAfterDays   Int     @default(3)
+  optOutMessage      String
+  helpMessage        String
+  statusTemplate     String
+  shopRecord         Shop    @relation(fields: [shop], references: [domain], onDelete: Cascade)
+}
+
+model ShopifySession {
+  id               String    @id
+  shop             String
+  state            String
+  isOnline         Boolean
+  scope            String?
+  expires          DateTime?
+  accessToken      String?
+  onlineAccessInfo String?
+  updatedAt        DateTime  @updatedAt
+
+  @@index([shop])
+}
+
+model OrderRecord {
+  id                String    @id @default(cuid())
+  shop              String
+  shopifyOrderId    String
+  orderName         String
+  customerFirstName String?
+  customerId        String?
+  email             String?
+  customerPhone     String?
+  financialStatus   String?
+  fulfillmentStatus String?
+  cancelled         Boolean   @default(false)
+  totalPrice        String?
+  currency          String?
+  orderStatusUrl    String?
+  trackingNumber    String?
+  trackingUrl       String?
+  trackingCompany   String?
+  statusSummary     String?
+  stalledNotifiedAt DateTime?
+  shopifyCreatedAt  DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([shop, shopifyOrderId])
+  @@index([customerPhone])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  shop           String
+  shopifyOrderId String?
+  direction      String
+  channel        String
+  body           String
+  status         String
+  twilioSid      String?
+  eventType      String?
+  fromPhone      String?
+  toPhone        String?
+  createdAt      DateTime @default(now())
+
+  @@index([shop, shopifyOrderId])
+  @@index([fromPhone])
+}
+
+model OutboundJob {
+  id             String   @id @default(cuid())
+  dedupeKey      String   @unique
+  shop           String
+  shopifyOrderId String
+  eventType      String
+  channel        String
+  toPhone        String
+  body           String
+  status         String   @default("pending")
+  attempts       Int      @default(0)
+  maxAttempts    Int      @default(5)
+  nextAttemptAt  DateTime @default(now())
+  lastError      String?
+  twilioSid      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status, nextAttemptAt])
+}
+
+model WebhookDelivery {
+  id          String   @id
+  topic       String
+  shop        String
+  processedAt DateTime @default(now())
+}
+
+model OptOut {
+  id        String   @id @default(cuid())
+  shop      String
+  phone     String
+  createdAt DateTime @default(now())
+
+  @@unique([shop, phone])
+}
+
+model PrivacyRequest {
+  id        String   @id @default(cuid())
+  shop      String
+  topic     String
+  payload   String
+  createdAt DateTime @default(now())
+}

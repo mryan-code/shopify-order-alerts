@@ -1,0 +1,34 @@
+name = "order-alerts"
+client_id = "00000000000000000000000000000000"
+application_url = "https://your-tunnel.example.com"
+embedded = true
+
+[access_scopes]
+scopes = "read_orders,read_customers"
+
+[auth]
+redirect_urls = ["https://your-tunnel.example.com/auth/callback"]
+
+[webhooks]
+api_version = "2026-01"
+
+  [[webhooks.subscriptions]]
+  topics = [
+    "orders/create",
+    "orders/paid",
+    "orders/cancelled",
+    "orders/fulfilled",
+    "fulfillments/create",
+    "fulfillments/update",
+    "fulfillment_events/create",
+    "refunds/create",
+    "app/uninstalled",
+  ]
+  uri = "/webhooks/shopify"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+  uri = "/webhooks/shopify"
+
+[pos]
+embedded = false

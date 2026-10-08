@@ -1,4 +1,13 @@
+node_modules/
+dist/
+web/dist/
+coverage/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 .env
 .env.*
 !.sample.env
-node_modules/
+.shopify/
+.DS_Store

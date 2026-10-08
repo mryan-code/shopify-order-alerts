@@ -1,0 +1,10 @@
+{
+  "name": "order-sms-block",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@shopify/ui-extensions": "2026.1.0",
+    "preact": "^10.27.2"
+  }
+}
